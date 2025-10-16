@@ -1,0 +1,8 @@
+server:
+  host: localhost
+  database:
+    user: admin
+    password: secret
+  server:
+    port: 8080
+    use_ssl: true

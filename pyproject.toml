@@ -1,0 +1,8 @@
+[project]
+name = "yaml_line_finder"
+version = "0.1.0"
+description = "Find the line number of a key in a YAML file"
+authors = [
+    { name="Jonas Nicklas", email="jonas.nicklas@teamtailor.com" }
+]
+dependencies = ["ruamel.yaml"]
