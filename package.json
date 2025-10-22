@@ -27,10 +27,10 @@
       {
         "title": "YAML Line Finder",
         "properties": {
-          "yamlLineFinder.translationFilePath": {
-            "type": "object",
-            "default": {},
-            "description": "Map file types to translation file paths. Example: { \"javascript\": \"src/locales/en.yaml\" }",
+          "yamlLineFinder.translationFiles": {
+            "type": "array",
+            "default": [],
+            "description": "An array of translation files. Example: [{ \"languages\": [\"erb\"], \"path\": \"config/locales/en.yml\", \"keyPrefix\": \"en\" }]",
             "scope": "resource"
           }
         }

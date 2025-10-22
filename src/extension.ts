@@ -1,6 +1,12 @@
 import * as vscode from "vscode";
 import { getYamlLineNumber } from "./get-yaml-line-number";
 
+type TranslationFile = {
+  path: string;
+  languages: string[];
+  keyPrefix?: string;
+};
+
 /**
  * Extracts the full dotted key path from the cursor position.
  * For example, if cursor is on "hello.foo.bar", it returns the entire key path.
@@ -66,13 +72,19 @@ export function activate(context: vscode.ExtensionContext) {
           const range = new vscode.Range(line, 0, line, 0);
           editor.selection = new vscode.Selection(range.start, range.start);
           editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
-          vscode.window.showInformationMessage(`Found key at line ${location.line}`);
+          vscode.window.showInformationMessage(
+            `Found key at line ${location.line}`
+          );
         } else {
-          vscode.window.showWarningMessage(`Key '${key}' not found in the file`);
+          vscode.window.showWarningMessage(
+            `Key '${key}' not found in the file`
+          );
         }
       } catch (error) {
         vscode.window.showErrorMessage(
-          `Error finding key: ${error instanceof Error ? error.message : String(error)}`
+          `Error finding key: ${
+            error instanceof Error ? error.message : String(error)
+          }`
         );
       }
     }
@@ -90,15 +102,18 @@ export function activate(context: vscode.ExtensionContext) {
 
       const languageId = editor.document.languageId;
       const config = vscode.workspace.getConfiguration("yamlLineFinder");
-      const translationFilePaths = config.get<Record<string, string>>(
-        "translationFilePath",
-        {}
+      const translationFiles = config.get<TranslationFile[]>(
+        "translationFiles",
+        []
       );
 
-      const translationFilePath = translationFilePaths[languageId];
-      if (!translationFilePath) {
+      const translationFile = translationFiles.find((file) =>
+        file.languages.includes(languageId)
+      );
+
+      if (!translationFile?.path) {
         vscode.window.showErrorMessage(
-          `No translation file path configured for language '${languageId}'`
+          `No translation file configured for language '${languageId}'`
         );
         return;
       }
@@ -124,10 +139,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         const resolvedPath = vscode.Uri.joinPath(
           workspaceFolder.uri,
-          translationFilePath
+          translationFile.path
         ).fsPath;
 
-        const location = getYamlLineNumber(resolvedPath, key);
+        const location = getYamlLineNumber(
+          resolvedPath,
+          [translationFile.keyPrefix, key].filter(Boolean).join(".")
+        );
         if (location) {
           // Open the translation file and jump to the line
           const doc = await vscode.workspace.openTextDocument(location.path);
