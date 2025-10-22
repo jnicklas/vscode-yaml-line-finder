@@ -1,5 +1,5 @@
 {
-  "name": "yaml-line-finder",
+  "name": "vscode-yaml-line-finder",
   "displayName": "YAML Line Finder",
   "description": "Find YAML keys and jump to their line numbers. Useful for working with translation files and configuration files.",
   "version": "1.0.0",
@@ -15,11 +15,11 @@
     "commands": [
       {
         "command": "yamlLineFinder.findKeyInCurrentFile",
-        "title": "YAML key: find in current file"
+        "title": "YAML line finder: find in current file"
       },
       {
         "command": "yamlLineFinder.jumpToTranslationFile",
-        "title": "YAML: jump to translation file"
+        "title": "YAML line finder: jump to translation file"
       }
     ],
     "configuration": [
@@ -42,7 +42,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -50,7 +51,8 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vsce": "^2.15.0"
   },
   "dependencies": {
     "yaml": "^2.3.0"

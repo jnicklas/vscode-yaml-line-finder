@@ -1,6 +1,40 @@
 import * as vscode from "vscode";
 import { getYamlLineNumber } from "./get-yaml-line-number";
 
+/**
+ * Extracts the full dotted key path from the cursor position.
+ * For example, if cursor is on "hello.foo.bar", it returns the entire key path.
+ */
+function getFullKeyPathAtCursor(
+  editor: vscode.TextEditor,
+  position: vscode.Position
+): string | null {
+  const line = editor.document.lineAt(position.line).text;
+  const column = position.character;
+
+  // Find the start of the key path by going backwards until we hit a non-word, non-dot character
+  let startIdx = column;
+  while (startIdx > 0 && /[\w.]/.test(line[startIdx - 1])) {
+    startIdx--;
+  }
+
+  // Find the end of the key path by going forwards until we hit a non-word, non-dot character
+  let endIdx = column;
+  while (endIdx < line.length && /[\w.]/.test(line[endIdx])) {
+    endIdx++;
+  }
+
+  // Extract the key path
+  const keyPath = line.substring(startIdx, endIdx);
+
+  // Ensure we have a valid key (not just dots, and contains at least one word character)
+  if (keyPath && /\w/.test(keyPath)) {
+    return keyPath;
+  }
+
+  return null;
+}
+
 export function activate(context: vscode.ExtensionContext) {
   // Command: Find YAML key in current file
   const findKeyCommand = vscode.commands.registerCommand(
@@ -69,16 +103,14 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      // Get the word under the cursor
+      // Get the full key path (including dots) under the cursor
       const selection = editor.selection;
-      const word = editor.document.getWordRangeAtPosition(selection.active);
+      const key = getFullKeyPathAtCursor(editor, selection.active);
 
-      if (!word) {
-        vscode.window.showErrorMessage("No word selected under cursor");
+      if (!key) {
+        vscode.window.showErrorMessage("No key found under cursor");
         return;
       }
-
-      const key = editor.document.getText(word);
 
       try {
         // Resolve the translation file path relative to the workspace root
