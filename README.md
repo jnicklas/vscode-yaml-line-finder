@@ -9,12 +9,14 @@ A VSCode extension that helps you quickly find and jump to YAML keys in your fil
 
 ## Commands
 
-### YAML key: find in current file
+### YAML Line Finder: find in current file
+
 - Command ID: `yamlLineFinder.findKeyInCurrentFile`
 - Opens an input prompt asking for a YAML key path (using dot notation, e.g., `server.database.user`)
 - Jumps to the line where the key is defined in the current file
 
-### YAML: jump to translation file
+### YAML Line Finder: jump to translation file
+
 - Command ID: `yamlLineFinder.jumpToTranslationFile`
 - Uses the word under the cursor as the YAML key
 - Jumps to that key in the configured translation file for the current file type
@@ -43,6 +45,7 @@ An object mapping file types to translation file paths. This allows you to confi
 ```
 
 In this example:
+
 - When you're editing a JavaScript file and run "YAML: jump to translation file", it will look for keys in `src/locales/en.yaml`
 - When you're editing a TypeScript file, it will also look in `src/locales/en.yaml`
 - When you're editing a Python file, it will look in `locales/en.yaml`

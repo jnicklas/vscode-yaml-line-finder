@@ -1,8 +1,9 @@
 {
   "name": "vscode-yaml-line-finder",
-  "displayName": "YAML Line Finder",
+  "displayName": "YAML Lne Finder",
   "description": "Find YAML keys and jump to their line numbers. Useful for working with translation files and configuration files.",
   "version": "1.0.0",
+  "repository": "https://github.com/jnicklas/vscode-yaml-line-finder",
   "engines": {
     "vscode": "^1.90.0"
   },
@@ -15,11 +16,11 @@
     "commands": [
       {
         "command": "yamlLineFinder.findKeyInCurrentFile",
-        "title": "YAML line finder: find in current file"
+        "title": "YAML Line Finder: find in current file"
       },
       {
         "command": "yamlLineFinder.jumpToTranslationFile",
-        "title": "YAML line finder: jump to translation file"
+        "title": "YAML Line Finder: jump to translation file"
       }
     ],
     "configuration": [
