@@ -9,6 +9,15 @@ type TranslationFile = {
 };
 
 /**
+ * Gets the column position of the first non-blank character on a line.
+ */
+function getFirstNonBlankColumn(editor: vscode.TextEditor, line: number): number {
+  const text = editor.document.lineAt(line).text;
+  const match = text.match(/^\s*/);
+  return match ? match[0].length : 0;
+}
+
+/**
  * Extracts the full dotted key path from the cursor position.
  * For example, if cursor is on "hello.foo.bar", it returns the entire key path.
  */
@@ -118,7 +127,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (location) {
           // Jump to the line
           const line = location.line - 1; // VSCode uses 0-based line numbering
-          const range = new vscode.Range(line, 0, line, 0);
+          const column = getFirstNonBlankColumn(editor, line);
+          const range = new vscode.Range(line, column, line, column);
           editor.selection = new vscode.Selection(range.start, range.start);
           editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
           vscode.window.showInformationMessage(
@@ -208,7 +218,8 @@ export function activate(context: vscode.ExtensionContext) {
           const doc = await vscode.workspace.openTextDocument(location.path);
           const editor = await vscode.window.showTextDocument(doc);
           const line = location.line - 1; // VSCode uses 0-based line numbering
-          const range = new vscode.Range(line, 0, line, 0);
+          const column = getFirstNonBlankColumn(editor, line);
+          const range = new vscode.Range(line, column, line, column);
           editor.selection = new vscode.Selection(range.start, range.start);
           editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
         } else {
