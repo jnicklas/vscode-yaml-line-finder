@@ -1,0 +1,58 @@
+{
+  "name": "yaml-line-finder",
+  "displayName": "YAML Line Finder",
+  "description": "Find YAML keys and jump to their line numbers. Useful for working with translation files and configuration files.",
+  "version": "1.0.0",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "yamlLineFinder.findKeyInCurrentFile",
+        "title": "YAML key: find in current file"
+      },
+      {
+        "command": "yamlLineFinder.jumpToTranslationFile",
+        "title": "YAML: jump to translation file"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "YAML Line Finder",
+        "properties": {
+          "yamlLineFinder.translationFilePath": {
+            "type": "object",
+            "default": {},
+            "description": "Map file types to translation file paths. Example: { \"javascript\": \"src/locales/en.yaml\" }",
+            "scope": "resource"
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.90.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.0"
+  }
+}
