@@ -30,7 +30,7 @@
           "yamlLineFinder.translationFiles": {
             "type": "array",
             "default": [],
-            "description": "An array of translation files. Example: [{ \"languages\": [\"erb\"], \"path\": \"config/locales/en.yml\", \"keyPrefix\": \"en\" }]",
+            "description": "An array of translation files. Example: [{ \"languages\": [\"erb\"], \"path\": \"config/locales/en.yml\", \"keyPrefix\": \"en\", \"relativeTo\": \"app/views\" }]",
             "scope": "resource"
           }
         }

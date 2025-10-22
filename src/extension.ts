@@ -5,6 +5,7 @@ type TranslationFile = {
   path: string;
   languages: string[];
   keyPrefix?: string;
+  relativeTo?: string;
 };
 
 /**
@@ -39,6 +40,54 @@ function getFullKeyPathAtCursor(
   }
 
   return null;
+}
+
+/**
+ * Handles lazy lookup for Rails translation keys that start with a dot.
+ * If relativeTo is configured and the key starts with a dot, this function
+ * will resolve it based on the current file's path relative to the relativeTo directory.
+ *
+ * Example: In app/views/books/index.erb, with relativeTo="app/views" and key=".foo",
+ * returns "books.index.foo"
+ */
+function resolveLazyLookupKey(
+  key: string,
+  currentFilePath: string,
+  relativeTo: string | undefined,
+  workspaceFolder: vscode.WorkspaceFolder
+): string {
+  // If key doesn't start with a dot or relativeTo is not configured, return as-is
+  if (!key.startsWith(".") || !relativeTo) {
+    return key;
+  }
+
+  // Convert the current file's path to a relative path from relativeTo
+  const workspacePath = workspaceFolder.uri.fsPath;
+  const relativeToPath = vscode.Uri.joinPath(
+    workspaceFolder.uri,
+    relativeTo
+  ).fsPath;
+
+  // Get the path relative to the relativeTo directory
+  let relativePath = currentFilePath;
+  if (relativePath.startsWith(relativeToPath)) {
+    relativePath = relativePath.substring(relativeToPath.length + 1); // +1 to remove leading slash
+  }
+
+  // Convert file path to dot notation
+  // e.g., "books/index.html.erb" -> "books.index"
+  // Remove the file extension(s) and convert slashes to dots
+  const filePathWithoutExtension = relativePath
+    .split(".")
+    .slice(0, -2) // Remove last two extensions (e.g., .html.erb or .erb)
+    .join(".");
+
+  const namespacePath = filePathWithoutExtension.replace(/\//g, ".");
+
+  // Combine namespace with the key (removing the leading dot)
+  const resolvedKey = namespacePath + key;
+
+  return resolvedKey;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -137,6 +186,14 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
 
+        // Handle lazy lookup for Rails translation keys (keys starting with a dot)
+        const resolvedKey = resolveLazyLookupKey(
+          key,
+          editor.document.fileName,
+          translationFile.relativeTo,
+          workspaceFolder
+        );
+
         const resolvedPath = vscode.Uri.joinPath(
           workspaceFolder.uri,
           translationFile.path
@@ -144,7 +201,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         const location = getYamlLineNumber(
           resolvedPath,
-          [translationFile.keyPrefix, key].filter(Boolean).join(".")
+          [translationFile.keyPrefix, resolvedKey].filter(Boolean).join(".")
         );
         if (location) {
           // Open the translation file and jump to the line
@@ -156,7 +213,7 @@ export function activate(context: vscode.ExtensionContext) {
           editor.revealRange(range, vscode.TextEditorRevealType.InCenter);
         } else {
           vscode.window.showWarningMessage(
-            `Key '${key}' not found in translation file`
+            `Key '${resolvedKey}' not found in translation file`
           );
         }
       } catch (error) {
